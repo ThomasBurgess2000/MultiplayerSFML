@@ -101,7 +101,7 @@ bool serverReady = false;
 characterSprite player("Ninjinka", 0.75, 0.25, 100, -200);
 bool multiplayerOn = true;
 float servX, servY;
-
+/*
 void renderWindow() {
     sf::RenderWindow serverWindow(sf::VideoMode(1280, 720), "Server");
     serverWindow.setPosition(sf::Vector2i(10, 50));
@@ -138,13 +138,15 @@ void server()
     }
     cout << "Server public IP is: " << sf::IpAddress::getPublicAddress() << endl;
     //cout << "Enter the client IP: ";
-    string clientIP = "174.82.86.186";
+    //string clientIP = "174.82.86.186";
     //cin >> clientIP;
-    sf::IpAddress sender = clientIP;
+    //sf::IpAddress sender = clientIP;
+    sf::IpAddress sender;
     //cout << "Enter the client port: ";
-    int clientPort = 50241;
+    //int clientPort = 50241;
     //cin >> clientPort;
-    unsigned short port = clientPort;
+    //unsigned short port = clientPort;
+    unsigned short port;
     serverReady = true;
     
     
@@ -163,13 +165,11 @@ void server()
     }
     return;
 }
-
+*/
 
 
 void client()
 {
-
-    char data[100] = { 'a','s','d','f','a','s','d','f','a','s','f','e','s','a','f','e','a','s','e','f','a','s','e','f','a','s','v','a','s','d','v','a','s','e','v','a','s','v','e','a','v','s','e','s','v','a','s','e','v','a','a','s','d','f','a','s','d','f','a','s','f','e','s','a','f','e','a','s','e','f','a','s','e','f','a','s','v','a','s','d','v','a','s','e','v','a','s','v','e','a','v','s','e','s','v','a','s','e','v','a' };
 
     sf::UdpSocket clientSocket;
     if (clientSocket.bind(50241) != sf::Socket::Done) {
@@ -179,7 +179,6 @@ void client()
         cout << "Client bound on socket: " << clientSocket.getLocalPort() << endl;
     }
     cout << "Client public IP is: " << sf::IpAddress::getPublicAddress() << endl;
-    while (serverReady == false);
     //cout << "Enter the server IP: ";
     string serverIP = "174.82.86.186";
     //cin >> serverIP;
@@ -213,16 +212,13 @@ void client()
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML");
+    window.setVerticalSyncEnabled(true);
+    if (!arial.loadFromFile("arial.ttf")) cout << "Could not load font" << endl;
     
-    if (!arial.loadFromFile("arial.ttf"))
-    {
-        cout << "Could not load font" << endl;
-    }
-    
-    
-    thread serverThread(server);
+    //Client communication with server
     thread clientThread(client);
 
+    //Display
     while (window.isOpen())
     {
         sf::Event event;
@@ -231,6 +227,7 @@ int main()
             switch (event.type)
             {
             case sf::Event::Closed:
+                cout << "Window closed.";
                 window.close();
                 break;
 
