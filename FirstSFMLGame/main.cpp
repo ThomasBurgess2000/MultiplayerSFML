@@ -4,6 +4,8 @@
 #include <vector>
 #include <iostream>
 #include <thread>
+#include <map>
+#include <algorithm>
 
 using namespace std;
 
@@ -42,15 +44,15 @@ public:
         displayName = tempText;
     }
 
-    characterSprite(string charName, float charHeight, float charWidth)
+    characterSprite(string charName, float x, float y)
     {
-        height = charHeight;
-        width = charWidth;
+        height = 0.75;
+        width = 0.25;
         name = charName;
         widthPx = width * 100;
         heightPx = height * 100;
-        xloc = 0;
-        yloc = 0;
+        xloc = x;
+        yloc = y;
         sf::RectangleShape tempRec(sf::Vector2f(widthPx, heightPx));
         charRec = tempRec;
         sf::Text tempText;
@@ -96,97 +98,31 @@ public:
     }
 };
 
+//Overload packet to carry characterSprite objects
+
+sf::Packet& operator <<(sf::Packet& packet, const characterSprite& character)
+{
+    return packet << character.name << character.xloc << character.yloc;
+}
+
+sf::Packet& operator >>(sf::Packet& packet, characterSprite& character)
+{
+    return packet >> character.name >> character.xloc >> character.yloc;
+}
+
 // Globals 
 bool serverReady = false;
 characterSprite player("Ninjinka", 0.75, 0.25, 100, -200);
 bool multiplayerOn = true;
 float servX, servY;
-/*
-void renderWindow() {
-    sf::RenderWindow serverWindow(sf::VideoMode(1280, 720), "Server");
-    serverWindow.setPosition(sf::Vector2i(10, 50));
-    sf::CircleShape circle(20.f);
-    while (serverWindow.isOpen())
-    {
-        // check all the window's events that were triggered since the last iteration of the loop
-        sf::Event event;
-        while (serverWindow.pollEvent(event))
-        {
-            // "close requested" event: we close the window
-            if (event.type == sf::Event::Closed)
-                serverWindow.close();
-        }
-        circle.setPosition(servX, -servY);
-        serverWindow.clear(sf::Color::Black);
-        serverWindow.draw(circle);
-        serverWindow.display();
-    }
-    return;
-}
+map <string, vector<float>> playerLocations;
+vector<characterSprite> players;
+sf::UdpSocket clientSocket;
 
-void server()
-{
-    thread serverWindowRenderThread (renderWindow);
-    sf::UdpSocket socket;
-    size_t received;
-    char data[100];
-    if (socket.bind(50240) != sf::Socket::Done) {
-        cout << "Server unable to bind to socket." << endl;
-    }
-    else {
-        cout << "Server bound on port: " << socket.getLocalPort() << endl;
-    }
-    cout << "Server public IP is: " << sf::IpAddress::getPublicAddress() << endl;
-    //cout << "Enter the client IP: ";
-    //string clientIP = "174.82.86.186";
-    //cin >> clientIP;
-    //sf::IpAddress sender = clientIP;
-    sf::IpAddress sender;
-    //cout << "Enter the client port: ";
-    //int clientPort = 50241;
-    //cin >> clientPort;
-    //unsigned short port = clientPort;
-    unsigned short port;
-    serverReady = true;
-    
-    
-    while (multiplayerOn) {
-        sf::Packet packet;
-        if (socket.receive(packet, sender, port) != sf::Socket::Done)
-        {
-            cout << "Didn't receieve client data" << endl;
-        }
-        cout << "Received a packet from " << sender << " on port " << port << endl;
-        // Server window
-        
-        packet >> servX >> servY;
-        
-
-    }
-    return;
-}
-*/
-
-
-void client()
+void clientSend(sf::IpAddress recipient, unsigned short port)
 {
 
-    sf::UdpSocket clientSocket;
-    if (clientSocket.bind(50241) != sf::Socket::Done) {
-        cout << "Client unable to bind to socket." << endl;
-    }
-    else {
-        cout << "Client bound on socket: " << clientSocket.getLocalPort() << endl;
-    }
-    cout << "Client public IP is: " << sf::IpAddress::getPublicAddress() << endl;
-    //cout << "Enter the server IP: ";
-    string serverIP = "174.82.86.186";
-    //cin >> serverIP;
-    sf::IpAddress recipient = serverIP;
-    //cout << "Enter the server port: ";
-    int serverPort = 50240;
-    //cin >> serverPort;
-    unsigned short port = serverPort;
+    
     // Send data if location changed
     bool locationChanged = true;
     float prevXY = player.xloc + player.yloc;
@@ -195,7 +131,7 @@ void client()
         if (prevXY != player.xloc + player.yloc) locationChanged = true;
         if (locationChanged) {
             sf::Packet packet;
-            packet << player.xloc << player.yloc;
+            packet << player;
             if (clientSocket.send(packet, recipient, port) != sf::Socket::Done) {
                 cout << "Did not send data." << endl;
             }
@@ -209,6 +145,35 @@ void client()
     return;
 }
 
+void clientReceive() {
+    sf::IpAddress sender;
+    unsigned short port;
+    sf::Packet packet;
+    while (multiplayerOn)
+    {
+        vector<characterSprite> localVarPlayers;
+        int numberOfPlayers = 0;
+        if (clientSocket.receive(packet, sender, port) != sf::Socket::Done) cout << "Error receiving data.";
+        packet >> numberOfPlayers;
+        for (int i = 0; i < numberOfPlayers; i++)
+        {
+            string playerName;
+            vector<float> xyCoord(2, 0);
+            packet >> playerName >> xyCoord[0] >> xyCoord[1];
+            characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
+            tempPlayer.setPosition(xyCoord[0], xyCoord[1]);
+            if (tempPlayer.name != player.name)
+            {
+                localVarPlayers.push_back(tempPlayer);
+            }
+        }
+        players = localVarPlayers;
+    }
+    
+
+    return;
+}
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML");
@@ -216,7 +181,20 @@ int main()
     if (!arial.loadFromFile("arial.ttf")) cout << "Could not load font" << endl;
     
     //Client communication with server
-    thread clientThread(client);
+    if (clientSocket.bind(50241) != sf::Socket::Done) {
+        cout << "Client unable to bind to socket." << endl;
+    }
+    else {
+        cout << "Client bound on socket: " << clientSocket.getLocalPort() << endl;
+    }
+    cout << "Client public IP is: " << sf::IpAddress::getPublicAddress() << endl;
+    string serverIP = "174.82.86.186";
+    sf::IpAddress recipient = serverIP;
+    int serverPort = 50240;
+    unsigned short port = serverPort;
+
+    thread clientSendThread(clientSend,recipient,port);
+    thread clientReceiveThread(clientReceive);
 
     //Display
     while (window.isOpen())
@@ -246,6 +224,11 @@ int main()
         }
 
         window.clear();
+        for (auto& it : players)
+        {
+            window.draw(it.charRec);
+            window.draw(it.displayName);
+        }
         window.draw(player.charRec);
         window.draw(player.displayName);
         window.display();
