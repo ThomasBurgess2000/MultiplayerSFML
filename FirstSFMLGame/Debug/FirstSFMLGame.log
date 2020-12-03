@@ -1,1 +1,5 @@
-﻿  FirstSFMLGame.vcxproj -> C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\Debug\FirstSFMLGame.exe
+﻿  main.cpp
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(43,41): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(61,41): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(79,41): warning C4244: 'argument': conversion from 'float' to 'unsigned int', possible loss of data
+  FirstSFMLGame.vcxproj -> C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\Debug\FirstSFMLGame.exe

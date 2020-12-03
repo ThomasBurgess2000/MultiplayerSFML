@@ -1,0 +1,2 @@
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\SFMLServer\Debug\SFMLServer.exe
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\SFMLServer\Debug\SFMLServer.pdb
