@@ -202,7 +202,7 @@ int main()
 
     thread clientSendThread(clientSend,recipient,port);
     thread clientReceiveThread(clientReceive);
-
+    vector<characterSprite> lastPlayerData;
     //Display
     while (window.isOpen())
     {
@@ -234,12 +234,20 @@ int main()
         if (playersBeingAccessed == false)
         {
             playersBeingAccessed = true;
+            lastPlayerData = players;
             for (auto& it : players)
             {
                 window.draw(it.charRec);
                 window.draw(it.displayName);
             }
             playersBeingAccessed = false;
+        }
+        else {
+            for (auto& it : lastPlayerData)
+            {
+                window.draw(it.charRec);
+                window.draw(it.displayName);
+            }
         }
         
         window.draw(player.charRec);
