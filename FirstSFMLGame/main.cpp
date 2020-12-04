@@ -112,12 +112,13 @@ sf::Packet& operator >>(sf::Packet& packet, characterSprite& character)
 
 // Globals 
 bool serverReady = false;
-characterSprite player("Ninjinka", 0.75, 0.25, 100, -200);
+characterSprite player("Bob", 0.75, 0.25, 100, -200);
 bool multiplayerOn = true;
 float servX, servY;
 map <string, vector<float>> playerLocations;
 vector<characterSprite> players;
 sf::UdpSocket clientSocket;
+bool playersBeingAccessed = false;
 
 void clientSend(sf::IpAddress recipient, unsigned short port)
 {
@@ -167,7 +168,13 @@ void clientReceive() {
                 localVarPlayers.push_back(tempPlayer);
             }
         }
-        players = localVarPlayers;
+        if (playersBeingAccessed == false)
+        {
+            playersBeingAccessed = true;
+            players = localVarPlayers;
+            playersBeingAccessed = false;
+        }
+
     }
     
 
@@ -224,11 +231,17 @@ int main()
         }
 
         window.clear();
-        for (auto& it : players)
+        if (playersBeingAccessed == false)
         {
-            window.draw(it.charRec);
-            window.draw(it.displayName);
+            playersBeingAccessed = true;
+            for (auto& it : players)
+            {
+                window.draw(it.charRec);
+                window.draw(it.displayName);
+            }
+            playersBeingAccessed = false;
         }
+        
         window.draw(player.charRec);
         window.draw(player.displayName);
         window.display();
