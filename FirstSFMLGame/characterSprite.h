@@ -2,13 +2,23 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include "ResourceHolder.h"
 
 
 using namespace std;
 
+namespace Textures
+{
+    enum ID
+    {
+        playerTexture,
+    };
+}
+
 extern sf::Font arial;
 extern sf::Texture playerTexture;
-
+//Try to load resources
+extern ResourceHolder<sf::Texture, Textures::ID> textures;
 
 class characterSprite
 {

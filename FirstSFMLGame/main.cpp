@@ -55,28 +55,28 @@ void clientReceive(characterSprite player) {
 
     vector<characterSprite> localVarPlayers;
     int numberOfPlayers = 0;
-    clientSocket.receive(packet, sender, port);
-    packet >> numberOfPlayers;
-    for (int i = 0; i < numberOfPlayers; i++)
+    if (clientSocket.receive(packet, sender, port) == sf::Socket::Done)
     {
-        string playerName;
-        vector<float> xyCoord(2, 0);
-        packet >> playerName >> xyCoord[0] >> xyCoord[1];
-        if (playerName != player.name)
+        packet >> numberOfPlayers;
+        for (int i = 0; i < numberOfPlayers; i++)
         {
-            characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
-            tempPlayer.setPosition(xyCoord[0], xyCoord[1]);
-            localVarPlayers.push_back(tempPlayer);
+            string playerName;
+            vector<float> xyCoord(2, 0);
+            packet >> playerName >> xyCoord[0] >> xyCoord[1];
+            if (playerName != player.name)
+            {
+                characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
+                tempPlayer.setPosition(xyCoord[0], xyCoord[1]);
+                localVarPlayers.push_back(tempPlayer);
+            }
+        }
+        if (playersBeingAccessed == false)
+        {
+            playersBeingAccessed = true;
+            players = localVarPlayers;
+            playersBeingAccessed = false;
         }
     }
-    if (playersBeingAccessed == false)
-    {
-        playersBeingAccessed = true;
-        players = localVarPlayers;
-        playersBeingAccessed = false;
-        }
-
-    
 
     return;
 }
@@ -90,7 +90,7 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1280, 720), "SFML");
     window.setVerticalSyncEnabled(true);
 
-    if (!arial.loadFromFile("arial.ttf")) cout << "Could not load font" << endl;
+    if (!arial.loadFromFile("C:/Windows/Fonts/arial.ttf")) cout << "Could not load font" << endl;
 
     //Client communication with server
     clientSocket.setBlocking(false);
@@ -105,6 +105,7 @@ int main()
     sf::IpAddress recipient = serverIP;
     int serverPort = 50240;
     unsigned short port = serverPort;
+    textures.load(Textures::playerTexture, "PinkGhost.png");
     characterSprite player("Ninjinka", 100, -200);
     vector<characterSprite> lastPlayerData;
     //Display

@@ -3,17 +3,10 @@
 
 sf::Font arial;
 
-namespace Textures
-{
-    enum ID
-    {
-        playerTexture,
-    };
-}
 
-//Try to load resources
+
+
 ResourceHolder<sf::Texture, Textures::ID> textures;
-
 
 characterSprite::characterSprite() {
     xloc = 0;
@@ -22,7 +15,6 @@ characterSprite::characterSprite() {
     displayName.setFont(arial);
     displayName.setString(name);
     displayName.setCharacterSize(17);
-    textures.load(Textures::playerTexture, "PinkGhost.png");
     sf::Sprite tempSprite(textures.get(Textures::playerTexture));
     sprite = tempSprite;
     setPosition(xloc, yloc);
@@ -36,7 +28,6 @@ characterSprite::characterSprite(string charName, float x, float y)
     displayName.setFont(arial);
     displayName.setString(name);
     displayName.setCharacterSize(17);
-    textures.load(Textures::playerTexture, "PinkGhost.png");
     sf::Sprite tempSprite(textures.get(Textures::playerTexture));
     sprite = tempSprite;
     //sprite.setColor(sf::Color(0, 255, 0));
