@@ -3,9 +3,6 @@
 
 sf::Font arial;
 
-
-
-
 ResourceHolder<sf::Texture, Textures::ID> textures;
 
 characterSprite::characterSprite() {
