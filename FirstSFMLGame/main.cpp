@@ -24,7 +24,6 @@ sf::Packet& operator >>(sf::Packet& packet, characterSprite& character)
 }
 
 // Globals 
-vector<characterSprite> players;
 map <string, characterSprite> playerMap;
 map<string, string> messageMap;
 sf::UdpSocket clientSocket;
@@ -54,7 +53,6 @@ void clientReceive(characterSprite player) {
     unsigned short port;
     sf::Packet packet;
 
-    vector<characterSprite> localVarPlayers;
     int numberOfPlayers = 0;
     int numberOfMessages = 0;
     if (clientSocket.receive(packet, sender, port) == sf::Socket::Done)
@@ -71,14 +69,19 @@ void clientReceive(characterSprite player) {
                 packet >> playerName >> xyCoord[0] >> xyCoord[1];
                 if (playerName != player.name)
                 {
-                    characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
-                    tempPlayer.setPosition(xyCoord[0], xyCoord[1]);
-                    localVarPlayers.push_back(tempPlayer);
-                    playerMap[playerName] = tempPlayer;
+                    if (playerMap.count(playerName))
+                    {
+                        playerMap[playerName].setPosition(xyCoord[0], xyCoord[1]);
+                    }
+                    else {
+                        characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
+                        tempPlayer.setPosition(xyCoord[0], xyCoord[1]);
+                        playerMap[playerName] = tempPlayer;
+                    }
+                    
                 }
             }
-            sort(localVarPlayers.begin(), localVarPlayers.end());
-            players = localVarPlayers;
+ 
         }
         else if (packetType == "playerMessages")
         {
@@ -87,7 +90,10 @@ void clientReceive(characterSprite player) {
             {
                 string playerName, message;
                 packet >> playerName >> message;
-                playerMap[playerName].message = message;
+                if (playerName != player.name) {
+                    playerMap[playerName].message = message;
+                }
+                
             }
         }
     }
