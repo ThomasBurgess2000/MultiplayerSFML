@@ -67,12 +67,15 @@ void clientReceive(characterSprite player) {
                 string playerName;
                 vector<float> xyCoord(2, 0);
                 packet >> playerName >> xyCoord[0] >> xyCoord[1];
+                // Don't add to the player map if it is the local player
                 if (playerName != player.name)
                 {
+                    // If it is already in the playerMap, just update location
                     if (playerMap.count(playerName))
                     {
                         playerMap[playerName].setPosition(xyCoord[0], xyCoord[1]);
                     }
+                    // Otherwise create a new player and put it in the map
                     else {
                         characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
                         tempPlayer.setPosition(xyCoord[0], xyCoord[1]);

@@ -82,17 +82,30 @@ void sendData()
     sf::Time t1 = sf::milliseconds(33);
     while (serverOn) {
         // Make a packet of player locations
-        sf::Packet packet;
-        packet << playerLocations.size();
+        sf::Packet locationPacket;
+        sf::Packet messagePacket;
+        string locationPacketType = "playerLocations";
+        string messagePacketType = "playerMessages";
+        // Locations
+        locationPacket << locationPacketType;
+        locationPacket << playerLocations.size();
         for (auto const& playerInfo : playerLocations) {
             // Format: number of players, playerName, playerNameX, playerNameY, playerName2...
-            packet << playerInfo.first << playerInfo.second[0] << playerInfo.second[1];
+            locationPacket << playerInfo.first << playerInfo.second[0] << playerInfo.second[1];
+        }
+        // Messages
+        messagePacket << messagePacketType;
+        messagePacket << playerMessages.size();
+        for (auto const& playerInfo : playerMessages) {
+            // Format: number of players, playerName, message...
+            messagePacket << playerInfo.first << playerInfo.second;
         }
         // Send player locations and messages to all connected clients
         for (auto const& clientInfo : clientsConnected) {
             sf::IpAddress recipient = clientInfo.ip;
             unsigned short port = clientInfo.port;
-            if (socket.send(packet, recipient, port) != sf::Socket::Done) cout << "Error sending data to " << recipient << endl;
+            if (socket.send(locationPacket, recipient, port) != sf::Socket::Done) cout << "Error sending data to " << recipient << endl;
+            if (socket.send(messagePacket, recipient, port) != sf::Socket::Done) cout << "Error sending data to " << recipient << endl;
         }
         sf::sleep(t1);
     }

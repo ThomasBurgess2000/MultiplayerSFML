@@ -1,4 +1,0 @@
-C:\Users\thoma\Desktop\Projects\FirstSFMLGame\Debug\FirstSFMLGame.exe
-C:\Users\thoma\Desktop\Projects\FirstSFMLGame\Debug\FirstSFMLGame.pdb
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\Debug\FirstSFMLGame.exe
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\Debug\FirstSFMLGame.pdb
