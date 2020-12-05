@@ -25,6 +25,8 @@ sf::Packet& operator >>(sf::Packet& packet, characterSprite& character)
 
 // Globals 
 vector<characterSprite> players;
+map <string, characterSprite> playerMap;
+map<string, string> messageMap;
 sf::UdpSocket clientSocket;
 bool playersBeingAccessed = false;
 sf::View view1;
@@ -35,7 +37,8 @@ void clientSend(sf::IpAddress recipient, unsigned short port, characterSprite pl
 {
     
     sf::Packet packet;
-    packet << player;
+    string packetType = "playerLocation";
+    packet << packetType << player;
     if (clientSocket.send(packet, recipient, port) != sf::Socket::Done) {
         cout << "Did not send data." << endl;
     }
@@ -53,22 +56,40 @@ void clientReceive(characterSprite player) {
 
     vector<characterSprite> localVarPlayers;
     int numberOfPlayers = 0;
+    int numberOfMessages = 0;
     if (clientSocket.receive(packet, sender, port) == sf::Socket::Done)
     {
-        packet >> numberOfPlayers;
-        for (int i = 0; i < numberOfPlayers; i++)
+        string packetType;
+        packet >> packetType;
+        if (packetType == "playerLocations")
         {
-            string playerName;
-            vector<float> xyCoord(2, 0);
-            packet >> playerName >> xyCoord[0] >> xyCoord[1];
-            if (playerName != player.name)
+            packet >> numberOfPlayers;
+            for (int i = 0; i < numberOfPlayers; i++)
             {
-                characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
-                tempPlayer.setPosition(xyCoord[0], xyCoord[1]);
-                localVarPlayers.push_back(tempPlayer);
+                string playerName;
+                vector<float> xyCoord(2, 0);
+                packet >> playerName >> xyCoord[0] >> xyCoord[1];
+                if (playerName != player.name)
+                {
+                    characterSprite tempPlayer(playerName, xyCoord[0], xyCoord[1]);
+                    tempPlayer.setPosition(xyCoord[0], xyCoord[1]);
+                    localVarPlayers.push_back(tempPlayer);
+                    playerMap[playerName] = tempPlayer;
+                }
+            }
+            sort(localVarPlayers.begin(), localVarPlayers.end());
+            players = localVarPlayers;
+        }
+        else if (packetType == "playerMessages")
+        {
+            packet >> numberOfMessages;
+            for (int i = 0; i < numberOfMessages; i++)
+            {
+                string playerName, message;
+                packet >> playerName >> message;
+                playerMap[playerName].message = message;
             }
         }
-        players = localVarPlayers;
     }
 
     return;
@@ -76,11 +97,13 @@ void clientReceive(characterSprite player) {
 
 // Other functions
 
-void unencryptedMessage() {
-    string messageString;
-    cout << "Unencrypted message: ";
-    
-    cout << messageString;
+void unencryptedMessage(sf::IpAddress recipient, unsigned short port, characterSprite player) {
+    sf::Packet packet;
+    string packetType = "message";
+    packet << packetType << player.name << player.message;
+    if (clientSocket.send(packet, recipient, port) != sf::Socket::Done) {
+        cout << "Did not send data." << endl;
+    }
     return;
 }
 
@@ -88,12 +111,18 @@ void unencryptedMessage() {
 
 int main()
 {
+
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "SFML");
     window.setVerticalSyncEnabled(true);
     view1.setCenter(sf::Vector2f(0, 0));
     view1.setSize(sf::Vector2f(1920, 1080));
     window.setView(view1);
     if (!arial.loadFromFile("C:/Windows/Fonts/arial.ttf")) cout << "Could not load font" << endl;
+
+    // Messaging variables
+    string mostRecentMessage;
+    sf::Text mostRecentMessageDrawable;
+    bool messagingMode = false;
 
     //Client communication with server
     clientSocket.setBlocking(false);
@@ -109,24 +138,24 @@ int main()
     int serverPort = 50240;
     unsigned short port = serverPort;
 
-    // Initialization of player
+    // Initialization of player and view
     textures.load(Textures::playerTexture, "PinkGhost.png");
     characterSprite player("Ninjinka", 100, -200);
     int lViewBoundary = view1.getCenter().x - (view1.getSize().x / 2);
     int rViewBoundary = view1.getCenter().x + (view1.getSize().x / 2);
     int uViewBoundary = view1.getCenter().y + (view1.getSize().y / 2);
     int dViewBoundary = view1.getCenter().y - (view1.getSize().y / 2);
-    bool messagingMode = false;
+    
     //Display
+    
     while (window.isOpen())
     {
         char playerDirection;
         bool movementKeyPressed = false;
         sf::Event event;
-        string mostRecentMessage;
-        sf::Text mostRecentMessageDrawable;
+        
         mostRecentMessageDrawable.setFont(arial);
-        mostRecentMessageDrawable.setCharacterSize(15);
+        mostRecentMessageDrawable.setCharacterSize(30);
         while (window.pollEvent(event))
         {
             switch (event.type)
@@ -137,9 +166,10 @@ int main()
                 break;
 
             case sf::Event::KeyPressed:
-                // MOVEMENT
                 if (messagingMode == false)
                 {
+                    // MOVEMENT
+
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
                         player.move(0.f, -10.f);
                         playerDirection = 'd';
@@ -168,35 +198,54 @@ int main()
                         // Set the current view boundaries
                         lViewBoundary = view1.getCenter().x - (view1.getSize().x / 2);
                         rViewBoundary = view1.getCenter().x + (view1.getSize().x / 2);
-                        uViewBoundary = view1.getCenter().y + (view1.getSize().y / 2);
-                        dViewBoundary = view1.getCenter().y - (view1.getSize().y / 2);
+                        uViewBoundary = view1.getCenter().y - (view1.getSize().y / 2);
+                        dViewBoundary = view1.getCenter().y + (view1.getSize().y / 2);
                         // If outside the view boundary, move the view
                         if (player.xloc < lViewBoundary) view1.move(-1920, 0);
                         if (player.xloc >= rViewBoundary) view1.move(1920, 0);
-                        if (-player.yloc < dViewBoundary) view1.move(0, -1080);
-                        if (-player.yloc >= uViewBoundary) view1.move(0, 1080);
+                        if (-player.yloc >= dViewBoundary) view1.move(0, 1080);
+                        if (-player.yloc < uViewBoundary) view1.move(0, -1080);
                     }
-                }
 
-                // Messaging
 
-                if (event.key.code == sf::Keyboard::U)
-                {
-                    messagingMode = true;
-                }
+                    // Messaging
 
-                if (messagingMode == true) {
-                    if (event.type == sf::Event::TextEntered)
+                    if (event.key.code == sf::Keyboard::U)
                     {
-                        if (event.text.unicode < 128) 
-                        {
-                            mostRecentMessage = mostRecentMessage + static_cast<char>(event.text.unicode);
-                            mostRecentMessageDrawable.setString(mostRecentMessage);
+                        messagingMode = true;
+                        mostRecentMessageDrawable.setString("[UNENCRYPTED]: ");
+                    }
+                    
+                }
+                break;
+            case sf::Event::TextEntered:
+                if (messagingMode == true) {
+                    if (event.text.unicode < 128)
+                    {
+                        // Writable characters
+                        if (event.text.unicode > 31) {
+                            // Don't log the 'u' that got you here
+                            if (event.text.unicode != 117 || mostRecentMessage.size() != 0)
+                            {
+                                mostRecentMessage = mostRecentMessage + static_cast<char>(event.text.unicode);
+                                mostRecentMessageDrawable.setString("[UNENCRYPTED]: " + mostRecentMessage);
+                            }
+                            
+                        }
+                        // Backspace
+                        if (event.text.unicode == 8 && mostRecentMessage.size() != 0) {
+                            mostRecentMessage.pop_back();
+                            mostRecentMessageDrawable.setString("[UNENCRYPTED]: " + mostRecentMessage);
+                        }
+                        // Enter
+                        if (event.text.unicode == 13) {
+                            player.message = mostRecentMessage;
+                            unencryptedMessage(recipient,port,player);
+                            mostRecentMessage.clear();
+                            messagingMode = false;
                         }
                     }
-                }
-
-                
+                }  
                 break;
 
             default:
@@ -210,17 +259,31 @@ int main()
         window.clear();
         window.setView(view1);
 
+        sf::Text drawableMessage;
+        drawableMessage.setFont(arial);
+        drawableMessage.setCharacterSize(20);
+        
+        // Draw remote players
         for (auto& it : players)
         {
             window.draw(it.sprite);
             window.draw(it.displayName);
+            drawableMessage.setString(it.message);
+            drawableMessage.setPosition(it.xloc - 20, -it.yloc - 30);
+            window.draw(drawableMessage);
         }
 
-        
+        // Draw local player
         window.draw(player.sprite);
         window.draw(player.displayName);
-        if (mostRecentMessage.empty() != true) {
-            mostRecentMessageDrawable.setPosition(lViewBoundary + 960, dViewBoundary + 10);
+        drawableMessage.setString(player.message);
+        drawableMessage.setPosition(player.xloc - 20, -player.yloc -30);
+        window.draw(drawableMessage);
+
+        // Draw message compose line
+        if (messagingMode)
+        {
+            mostRecentMessageDrawable.setPosition(lViewBoundary + 20, dViewBoundary - 40);
             window.draw(mostRecentMessageDrawable);
         }
         window.display();

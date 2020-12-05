@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "ResourceHolder.h"
+#include <algorithm>
 
 
 using namespace std;
@@ -29,7 +30,9 @@ public:
     float yloc;
     sf::Sprite sprite;
     sf::Text displayName;
+    string message = "";
 
+    bool operator< (const characterSprite& other) const;
 
     characterSprite();
 

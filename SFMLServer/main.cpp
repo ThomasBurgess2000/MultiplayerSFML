@@ -15,7 +15,8 @@ struct client
 
 
 map <string, vector<float>> playerLocations;
-//map <sf::IpAddress, unsigned short> clientsConnected;
+map <string, string> playerMessages;
+map <string, pair<float, string>> playerInfo;
 vector<client> clientsConnected;
 sf::UdpSocket socket;
 
@@ -42,10 +43,9 @@ void receiveData()
         sf::Packet packet;
 
         // Player data
-        vector<float> xyCoord(2, 0);
         string playerName;
 
-        // Receive and store data
+        // Receive data
         if (socket.receive(packet, sender, port) != sf::Socket::Done) cout << "Error receiving data.";
         client tempClient;
         tempClient.ip = sender;
@@ -54,11 +54,24 @@ void receiveData()
         {
             clientsConnected.push_back(tempClient);
         }
-        packet >> playerName >> xyCoord[0] >> xyCoord[1];
-        playerLocations[playerName] = xyCoord;
+        // Check what kind of information is in the packet
+        string packetType;
+        packet >> packetType;
+        if (packetType == "playerLocation") {
+            vector<float> xyCoord(2, 0);
+            packet >> playerName >> xyCoord[0] >> xyCoord[1];
+            playerLocations[playerName] = xyCoord;
+            cout << playerName << " is at " << playerLocations[playerName][0] << ", " << playerLocations[playerName][1] << endl;
+        }
+        else if (packetType == "message"){
+            string message;
+            packet >> playerName >> message;
+            playerMessages[playerName] = message;
+            cout << playerName << ": " << message << endl;
+        }
 
         // Log location
-        cout << playerName << " is at " << playerLocations[playerName][0] << ", " << playerLocations[playerName][1] << endl;
+        
 
     }
     return;
@@ -75,7 +88,7 @@ void sendData()
             // Format: number of players, playerName, playerNameX, playerNameY, playerName2...
             packet << playerInfo.first << playerInfo.second[0] << playerInfo.second[1];
         }
-        // Send player locations to all connected clients
+        // Send player locations and messages to all connected clients
         for (auto const& clientInfo : clientsConnected) {
             sf::IpAddress recipient = clientInfo.ip;
             unsigned short port = clientInfo.port;

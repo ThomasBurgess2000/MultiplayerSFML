@@ -5,6 +5,10 @@ sf::Font arial;
 
 ResourceHolder<sf::Texture, Textures::ID> textures;
 
+bool characterSprite::operator< (const characterSprite& other) const {
+    return name < other.name;
+}
+
 characterSprite::characterSprite() {
     xloc = 0;
     yloc = 0;
@@ -44,5 +48,5 @@ void characterSprite::setPosition(float x, float y)
     xloc = x;
     yloc = y;
     sprite.setPosition(x, -y);
-    displayName.setPosition(x + 18, -y + 90);
+    displayName.setPosition(x, -y + 90);
 }

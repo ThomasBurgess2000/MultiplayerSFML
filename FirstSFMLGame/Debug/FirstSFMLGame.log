@@ -1,44 +1,44 @@
 ﻿  main.cpp
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(115,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(144,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(116,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(145,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(117,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(146,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(118,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(147,23): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(169,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(199,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(170,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(200,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(171,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(201,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(172,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(202,61): warning C4244: '=': conversion from 'T' to 'int', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(223,86): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(223,65): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(286,85): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\main.cpp(286,65): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
   FirstSFMLGame.vcxproj -> C:\Users\thoma\Desktop\Projects\MultiplayerSFML\FirstSFMLGame\Debug\FirstSFMLGame.exe
