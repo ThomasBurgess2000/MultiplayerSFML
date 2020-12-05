@@ -264,12 +264,12 @@ int main()
         drawableMessage.setCharacterSize(20);
         
         // Draw remote players
-        for (auto& it : players)
+        for (auto& it : playerMap)
         {
-            window.draw(it.sprite);
-            window.draw(it.displayName);
-            drawableMessage.setString(it.message);
-            drawableMessage.setPosition(it.xloc - 20, -it.yloc - 30);
+            window.draw(it.second.sprite);
+            window.draw(it.second.displayName);
+            drawableMessage.setString(it.second.message);
+            drawableMessage.setPosition(it.second.xloc - 20, -it.second.yloc - 30);
             window.draw(drawableMessage);
         }
 
