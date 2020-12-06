@@ -132,19 +132,39 @@ int main()
     string mostRecentMessage;
     sf::Text mostRecentMessageDrawable;
     bool messagingMode = false;
-
+    bool debugMode = false;
     //Client communication with server
     clientSocket.setBlocking(false);
-    if (clientSocket.bind(50241) != sf::Socket::Done) {
+    unsigned short clientPort;
+    string serverIP;
+    int serverPort;
+    // Debug mode
+    if (debugMode == true)
+    {
+        clientPort = 50241;
+        serverIP = "174.82.86.186";
+        serverPort = 50240;
+    }
+    // Release mode
+    else {
+        cout << "Enter the port you want to use (e.g. 50242): ";
+        cin >> clientPort;
+        cin.ignore(256, '\n');
+        cout << "Enter the server IP (e.g. 174.82.86.186): ";
+        getline(cin, serverIP);
+        cout << "Enter the server port (e.g. 50240): ";
+        cin >> serverPort;
+    }
+    // Save server and client info
+    if (clientSocket.bind(clientPort) != sf::Socket::Done) {
         cout << "Client unable to bind to socket." << endl;
     }
     else {
         cout << "Client bound on socket: " << clientSocket.getLocalPort() << endl;
     }
     cout << "Client public IP is: " << sf::IpAddress::getPublicAddress() << endl;
-    string serverIP = "174.82.86.186";
+    
     sf::IpAddress recipient = serverIP;
-    int serverPort = 50240;
     unsigned short port = serverPort;
 
     // Initialization of player and view
