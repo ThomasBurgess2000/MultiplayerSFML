@@ -147,10 +147,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="characterSprite.cpp" />
+    <ClCompile Include="game.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="characterSprite.h" />
+    <ClInclude Include="game.h" />
     <ClInclude Include="ResourceHolder.h" />
   </ItemGroup>
   <ItemGroup>

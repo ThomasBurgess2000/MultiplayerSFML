@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "characterSprite.h"
 #include "ResourceHolder.h"
+#include "game.h"
 
 using namespace std;
 
@@ -28,7 +29,7 @@ map <string, characterSprite> playerMap;
 map<string, string> messageMap;
 sf::UdpSocket clientSocket;
 bool playersBeingAccessed = false;
-sf::View view1;
+
 
 // Server communication functions
 
